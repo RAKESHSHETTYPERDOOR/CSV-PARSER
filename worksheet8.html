@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+   <html>
+        <head>
+            <title>CUSTOMER DASHBOARD</title>
+            <style>
+               .id{
+                display: flex;
+                flex-wrap: nowrap;
+                background-color: white;
+               }
+               .id > div{
+                
+                background-color: #f1f1f1;
+                width: 140px;
+                margin: 150px;
+                text-align: center;
+                line-height: 75px;
+                font-size: 30px;
+               }
+            
+             
+             .piechart1{
+                
+                 
+                 padding-left: 400px;
+                
+                 margin-top: -260px;
+                 
+             }
+             
+
+
+
+            </style>
+        </head>
+        <body>
+            <div id="root">
+               
+    
+            </div>
+    
+            <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+            <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+            <script src="https://unpkg.com/axios/dist/axios.min.js"> </script>
+            <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/react-modal/3.14.3/react-modal.min.js"
+            integrity="sha512-MY2jfK3DBnVzdS2V8MXo5lRtr0mNRroUI9hoLVv2/yL3vrJTam3VzASuKQ96fLEpyYIT4a8o7YgtUs5lPjiLVQ=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"></script>
+            <script type="text/babel">
+            // const roothandle=document.getElementById('root')
+                const rootHandle = document.getElementById('root')
+                
+                const { useState } = React
+                google.charts.load('current', {'packages':['corechart']});
+                // google.charts.setOnLoadCallback(drawChart);
+            
+
+                //ORDER CHART COMPONENT
+
+                function OrdersChart(props){
+                   const {obj} = props
+                   let pyValue = Object.entries(obj)
+                   pyValue.unshift(['orders', 'Customers'])
+                   console.log(obj)
+                   console.log(pyValue)
+                   google.charts.setOnLoadCallback(drawChart);
+                
+
+                function drawChart() {
+                var data = google.visualization.arrayToDataTable(pyValue);
+
+                var options = { 'width':550, 'height':400};
+
+                var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+                chart.draw(data, options);
+               }
+
+                   
+                
+                    return(
+                        <div id =  {'piechart'} className={"piechart1"}>
+                           
+                        </div>
+                    )
+               }
+                
+               //ORDER DISTRIBUTION COMPONENT
+
+                function OrderDistribution(props){
+                const {userData } = props
+
+                const phoneArr = userData.map((ele)=>{
+                        return ele.Phone
+                    })
+
+                const customers = phoneArr.filter((ele, id) => {
+                        return phoneArr.indexOf(ele) == id 
+                })
+                // let obj = {}
+                var rv = {};
+                
+                    for (var i = 0; i < customers.length; ++i){
+                        rv[customers[i]] = 0
+                    // return rv;
+                    }
+                 
+                userData.forEach(function(ele) {
+                    if(rv.hasOwnProperty(ele.Phone)){
+                        rv[ele.Phone]  = rv[ele.Phone] + 1
+                    }
+                })
+                console.log(rv)
+                // console.log(Object.keys(rv).length);
+                let obj = {1:0,2:0,3:0,4:0,'5+':0}
+                const orderValue = Object.entries(obj)
+
+                Object.values(rv).filter((ele) =>{
+                    if(obj.hasOwnProperty(ele)){
+                        obj[ele] = obj[ele] + 1
+                    }else{
+                        obj['5+'] = obj['5+'] + 1
+                    }
+                })
+                // console.log(obj);
+                // console.log(count)
+                   return(
+                       <div >
+                            <h1>Orders Distribution</h1>
+                            <table border = "1" className={"pie"}>
+                               <thead>
+                                    <tr>
+                                        <th>No of Orders</th>
+                                        <th>Count of Customers</th>
+                                    </tr>
+                                </thead> 
+                                <tbody>
+                                    
+                                        {Object.values(obj).map((ele,i)=>{
+                                           return(
+                                                    <tr key = {i} >
+                                                        <td>{i+1}</td>
+                                                        <td>{ele}</td>
+                                                    </tr>
+                                           )
+                                        })}
+                                    
+                                </tbody>
+                            </table>
+                            <OrdersChart obj = {obj}/>
+                        </div>
+                   )
+               }
+
+               //SEARCH COMPONENT
+
+                function Search(props){
+                    const {values,handleChange,name,phone,abc} = props
+                    console.log(abc)
+                    return(
+                        <div>
+                           
+                            <table border = "1">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Name</th>
+                                        <th>Phone</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                 {abc.map((ele,i)=>{
+                                       return (<tr key = {i} >
+                                            <td>{i+1}</td>
+                                            <td>{ele.Name}</td>
+                                            <td>{ele.Phone}</td>
+                                            <td><button>show</button></td>
+                                        </tr>)
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    )
+                }
+
+                function CustomerTable (props){
+                    const {newData,showDetails}=props
+                    
+                    
+                    
+                    return(
+                        <div>
+                            <table border = "1">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>NAME</th>
+                                        <th>PHONE</th>
+                                        <th>DETAILS</th>
+                                    </tr>     
+                                    
+                                </thead>
+                                
+                                
+
+                                <tbody>
+                                   {
+                                       newData.map((ele,i)=>{
+                                           return <tr key={i}>
+                                                   <td>{i+1}</td>
+                                                   <td>{ele.Name}</td>
+                                                   <td>{ele.Phone}</td>
+                                                   <td><button onClick = {() =>{
+                                                       showDetails(ele.Phone)
+                                                   }}>show</button></td>
+                                                   </tr>
+                                       })
+                                   }
+                                   
+                                    
+                                    
+                                    
+                               </tbody>
+                                
+                                
+                           </table>
+
+
+                           
+                           
+                        </div>
+                    )
+                }
+               
+                //CUSTOMER CONTAINER COMPONENT
+                function Show(props) {
+                    const{details,model,showname}  = props
+                    console.log(details)
+                    
+                    return(
+                            <div>
+                                
+                                <ReactModal isOpen = {model} >
+                                 <h1>User-{showname}</h1>                              
+                                </ReactModal>
+                            </div>
+                        )
+                }
+                function CustomerContainer(props){
+                  const{ userData } = props
+                  const [table,setTable] = useState(newData)
+                  const [values,setValues] = useState('')
+                  const[id,setId] = useState('')
+                  const[name,setName] = useState('')
+                  const[phone,setPhone] = useState('')
+                  const[abc,setAbc] = useState([])
+                const [model,setModel] = useState(false)
+                const[details,setDetails] = useState([])
+                const [showname,setshowname]=useState('')
+                const [amount,setamount]=useState()
+                // console.log(newData)
+                    // console.log(table);
+                    
+                  const userhashmap={}
+     
+                  const  newData=userData.filter((item,_)=>{
+                    let alreadyexists=userhashmap.hasOwnProperty(item.Phone)
+                    return alreadyexists? false :userhashmap[item.Phone]=1
+                })
+
+                    // console.log(newData)
+
+
+                    const handleChange = (e) =>{
+                        setValues(e.target.value)
+                        setTable('')
+                        const a = newData.filter((ele,i)=>{
+                            return ele.Name.toLowerCase().includes(values) || String(ele.Phone).includes(values)
+                               
+                        })
+
+                        // console.log(a)
+                        setAbc(a)
+
+                    }
+
+                    function showDetails(phone){
+                        setModel(true)
+                        // return(
+                        //     <div>
+                                
+                        //         <ReactModal isOpen = {model} >
+                                   
+                        //                 return <h2>modal</h2>
+                                    
+                                    
+                        //         </ReactModal>
+                        //     </div>
+                        // )
+                        const data = userData.filter((ele) =>{
+                            return ele.Phone === phone
+                        })
+                        setDetails(data)
+                        
+                    }
+
+                    details.map((ele)=>{
+                        setshowname(ele.Name)
+                        
+                    })
+
+
+
+                    console.log(details)
+
+                    // console.log(values)
+                    return(
+                        <div>
+                            <h1>Listing Customers</h1>
+                            <input type="text " placeholder = "search" value = {values}  onChange = {handleChange}/>
+                             {values.length ===0 ? <CustomerTable newData={newData} showDetails = {showDetails}/> :
+                             <Search values = {values}
+                                    handleChange = {handleChange}
+                                    name = {name} phone = {phone} 
+                                    abc = {abc}/>
+                            
+                            } 
+                            {details.length > 0 && <Show details = {details} model = {model} showname={showname}/>}
+                             
+                        
+                            
+                            
+                        </div>
+                    )
+                }
+                
+                //STATS ITEM COMPONENT
+               
+                function StatsItem(props){
+
+                    const {userData,totalAmount,totalCustomers} = props
+
+                    return(
+                        <div className={"id"} >
+                            <div> {userData.length} <br/>
+                                 orders  
+                                </div>
+                           
+                            <div >{totalAmount} <br/>
+                                Amount
+                                </div>
+                           
+                            <div> {totalCustomers} <br/>
+                                Customers
+                                </div>
+                            
+                        </div>
+                    )
+
+                }
+                //STATS CONTAINER COMPONENT
+
+                function StatsContainer(props){
+                    const {userData} = props
+                  
+                    let amount = 0
+
+                    const amountArr = userData.map((ele) =>{
+                         amount = amount +  ele.Amount
+                        //  console.log(amount)
+                         return amount
+                    })
+
+                    //console.log(amountArr)
+
+                  //  console.log(amount)
+
+                    const totalAmount = amountArr[amountArr.length -1]
+                   console.log(totalAmount)
+
+                    const phoneArr = userData.map((ele)=>{
+                        return ele.Phone
+                    })
+
+                    console.log(phoneArr)
+
+                    
+                
+                    const customers = phoneArr.filter((ele, id) => {
+                        return phoneArr.indexOf(ele) == id 
+                    })
+
+                  //  console.log(customers)
+
+                    const totalCustomers = customers.length
+ 
+                    // console.log(finalNames)
+
+                    return(
+                        <div>
+                            <StatsItem userData = {userData}
+                                       totalAmount= {totalAmount}
+                                       totalCustomers = {totalCustomers}
+                                       />
+                           
+                            
+                            
+                        </div>
+                    )
+                }
+
+               //APP COMPONENT
+               
+                function App(props){
+                    
+                    const data = [
+            {
+                "Date": "2020-04-29",
+                "Phone": 9455622241,
+                "Name": "Shankara Narasimhan",
+                "Amount": 260
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9597628723,
+                "Name": "Sulya Gupta",
+                "Amount": 90
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9640338121,
+                "Name": "Brahma Swamy",
+                "Amount": 80
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9383568793,
+                "Name": "Vaibhav Mulye",
+                "Amount": 240
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9455622241,
+                "Name": "Shankara Narasimhan",
+                "Amount": 230
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9521737322,
+                "Name": "Riddhi Nair",
+                "Amount": 70
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 80
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9603660688,
+                "Name": "Dhenuka Dhawan",
+                "Amount": 250
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9451926724,
+                "Name": "Sahan Sibal",
+                "Amount": 260
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9699939066,
+                "Name": "Haripriya Nayak",
+                "Amount": 270
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9590146908,
+                "Name": "Sachi Loliyekar",
+                "Amount": 110
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 100
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9640338121,
+                "Name": "Brahma Swamy",
+                "Amount": 240
+            },
+            {
+                "Date": "2020-04-29",
+                "Phone": 9236367267,
+                "Name": "Takshaka Sandal",
+                "Amount": 70
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9969345730,
+                "Name": "Kavi Edwin",
+                "Amount": 210
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 280
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9971276037,
+                "Name": "Pramlocha Comar",
+                "Amount": 210
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9241664018,
+                "Name": "Utathya Ghate",
+                "Amount": 260
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9248936762,
+                "Name": "Arpana Raja",
+                "Amount": 260
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9640338121,
+                "Name": "Brahma Swamy",
+                "Amount": 200
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9895408016,
+                "Name": "Mukul Krishna",
+                "Amount": 180
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9241664018,
+                "Name": "Utathya Ghate",
+                "Amount": 260
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9920950009,
+                "Name": "Rohan Sarma",
+                "Amount": 110
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9820224845,
+                "Name": "Tanika Philip",
+                "Amount": 90
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9383568793,
+                "Name": "Vaibhav Mulye",
+                "Amount": 200
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9732082404,
+                "Name": "Kali Chaudry",
+                "Amount": 290
+            },
+            {
+                "Date": "2020-04-30",
+                "Phone": 9534474777,
+                "Name": "Daeva Tata",
+                "Amount": 70
+            },
+            {
+                "Date": "2020-05-01",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 160
+            },
+            {
+                "Date": "2020-05-01",
+                "Phone": 9572464275,
+                "Name": "Salmalin Mehta",
+                "Amount": 100
+            },
+            {
+                "Date": "2020-05-01",
+                "Phone": 9688156631,
+                "Name": "Sahan Oak",
+                "Amount": 200
+            },
+            {
+                "Date": "2020-05-01",
+                "Phone": 9236367267,
+                "Name": "Takshaka Sandal",
+                "Amount": 250
+            },
+            {
+                "Date": "2020-05-01",
+                "Phone": 9979209995,
+                "Name": "Atman Mathur",
+                "Amount": 140
+            },
+            {
+                "Date": "2020-05-01",
+                "Phone": 9521737322,
+                "Name": "Riddhi Nair",
+                "Amount": 140
+            },
+            {
+                "Date": "2020-05-01",
+                "Phone": 9265205814,
+                "Name": "Daeva Peri",
+                "Amount": 180
+            },
+            {
+                "Date": "2020-05-01",
+                "Phone": 9267357082,
+                "Name": "Muni Wasgare",
+                "Amount": 210
+            },
+            {
+                "Date": "2020-05-01",
+                "Phone": 9267357082,
+                "Name": "Muni Wasgare",
+                "Amount": 290
+            },
+            {
+                "Date": "2020-05-01",
+                "Phone": 9590146908,
+                "Name": "Sachi Loliyekar",
+                "Amount": 190
+            },
+            {
+                "Date": "2020-05-01",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 290
+            },
+            {
+                "Date": "2020-05-01",
+                "Phone": 9241664018,
+                "Name": "Utathya Ghate",
+                "Amount": 180
+            },
+            {
+                "Date": "2020-05-02",
+                "Phone": 9971276037,
+                "Name": "Pramlocha Comar",
+                "Amount": 80
+            },
+            {
+                "Date": "2020-05-02",
+                "Phone": 9920950009,
+                "Name": "Rohan Sarma",
+                "Amount": 140
+            },
+            {
+                "Date": "2020-05-02",
+                "Phone": 9705384480,
+                "Name": "Latif Chia",
+                "Amount": 70
+            },
+            {
+                "Date": "2020-05-02",
+                "Phone": 9252350612,
+                "Name": "Anushka Mody",
+                "Amount": 150
+            },
+            {
+                "Date": "2020-05-02",
+                "Phone": 9688156631,
+                "Name": "Sahan Oak",
+                "Amount": 290
+            },
+            {
+                "Date": "2020-05-02",
+                "Phone": 9359394987,
+                "Name": "Tarun Mapkar",
+                "Amount": 260
+            },
+            {
+                "Date": "2020-05-02",
+                "Phone": 9747425720,
+                "Name": "Markandeya Barad",
+                "Amount": 100
+            },
+            {
+                "Date": "2020-05-02",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 180
+            },
+            {
+                "Date": "2020-05-02",
+                "Phone": 9699939066,
+                "Name": "Haripriya Nayak",
+                "Amount": 110
+            },
+            {
+                "Date": "2020-05-02",
+                "Phone": 9590146908,
+                "Name": "Sachi Loliyekar",
+                "Amount": 220
+            },
+            {
+                "Date": "2020-05-02",
+                "Phone": 9820224845,
+                "Name": "Tanika Philip",
+                "Amount": 220
+            },
+            {
+                "Date": "2020-05-02",
+                "Phone": 9747425720,
+                "Name": "Markandeya Barad",
+                "Amount": 90
+            },
+            {
+                "Date": "2020-05-03",
+                "Phone": 9910042819,
+                "Name": "Shanti Bajwa",
+                "Amount": 100
+            },
+            {
+                "Date": "2020-05-03",
+                "Phone": 9518195948,
+                "Name": "Indra Chaudry",
+                "Amount": 110
+            },
+            {
+                "Date": "2020-05-03",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 80
+            },
+            {
+                "Date": "2020-05-03",
+                "Phone": 9236367267,
+                "Name": "Takshaka Sandal",
+                "Amount": 100
+            },
+            {
+                "Date": "2020-05-03",
+                "Phone": 9640338121,
+                "Name": "Brahma Swamy",
+                "Amount": 100
+            },
+            {
+                "Date": "2020-05-03",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 120
+            },
+            {
+                "Date": "2020-05-03",
+                "Phone": 9453085874,
+                "Name": "Manu Oza",
+                "Amount": 120
+            },
+            {
+                "Date": "2020-05-03",
+                "Phone": 9976945538,
+                "Name": "Amitabha Kothari",
+                "Amount": 270
+            },
+            {
+                "Date": "2020-05-03",
+                "Phone": 9910042819,
+                "Name": "Shanti Bajwa",
+                "Amount": 280
+            },
+            {
+                "Date": "2020-05-03",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 200
+            },
+            {
+                "Date": "2020-05-03",
+                "Phone": 9405883814,
+                "Name": "Gauri Som",
+                "Amount": 220
+            },
+            {
+                "Date": "2020-05-03",
+                "Phone": 9252350612,
+                "Name": "Anushka Mody",
+                "Amount": 170
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9453085874,
+                "Name": "Manu Oza",
+                "Amount": 120
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9640338121,
+                "Name": "Brahma Swamy",
+                "Amount": 150
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9927277067,
+                "Name": "Ranjan Khare",
+                "Amount": 80
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9910042819,
+                "Name": "Shanti Bajwa",
+                "Amount": 250
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 200
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9293117791,
+                "Name": "Kumara Nayak",
+                "Amount": 250
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9976945538,
+                "Name": "Amitabha Kothari",
+                "Amount": 110
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9518195948,
+                "Name": "Indra Chaudry",
+                "Amount": 200
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9518195948,
+                "Name": "Indra Chaudry",
+                "Amount": 130
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 140
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9521737322,
+                "Name": "Riddhi Nair",
+                "Amount": 120
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9920950009,
+                "Name": "Rohan Sarma",
+                "Amount": 120
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9597628723,
+                "Name": "Sulya Gupta",
+                "Amount": 140
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9534474777,
+                "Name": "Daeva Tata",
+                "Amount": 70
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9009381182,
+                "Name": "Mira Reddy",
+                "Amount": 240
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9009381182,
+                "Name": "Mira Reddy",
+                "Amount": 160
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9236367267,
+                "Name": "Takshaka Sandal",
+                "Amount": 150
+            },
+            {
+                "Date": "2020-05-04",
+                "Phone": 9265205814,
+                "Name": "Daeva Peri",
+                "Amount": 180
+            },
+            {
+                "Date": "2020-05-05",
+                "Phone": 9451926724,
+                "Name": "Sahan Sibal",
+                "Amount": 170
+            },
+            {
+                "Date": "2020-05-05",
+                "Phone": 9504662177,
+                "Name": "Tara Menon",
+                "Amount": 230
+            },
+            {
+                "Date": "2020-05-05",
+                "Phone": 9455622241,
+                "Name": "Shankara Narasimhan",
+                "Amount": 200
+            },
+            {
+                "Date": "2020-05-05",
+                "Phone": 9927277067,
+                "Name": "Ranjan Khare",
+                "Amount": 110
+            },
+            {
+                "Date": "2020-05-05",
+                "Phone": 9521737322,
+                "Name": "Riddhi Nair",
+                "Amount": 90
+            },
+            {
+                "Date": "2020-05-05",
+                "Phone": 9252350612,
+                "Name": "Anushka Mody",
+                "Amount": 120
+            },
+            {
+                "Date": "2020-05-05",
+                "Phone": 9699939066,
+                "Name": "Haripriya Nayak",
+                "Amount": 70
+            },
+            {
+                "Date": "2020-05-05",
+                "Phone": 9150159527,
+                "Name": "Leya Sankaran",
+                "Amount": 270
+            },
+            {
+                "Date": "2020-05-05",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 240
+            },
+            {
+                "Date": "2020-05-05",
+                "Phone": 9733555024,
+                "Name": "Nirav Khalsa",
+                "Amount": 110
+            },
+            {
+                "Date": "2020-05-05",
+                "Phone": 9236367267,
+                "Name": "Takshaka Sandal",
+                "Amount": 200
+            },
+            {
+                "Date": "2020-05-05",
+                "Phone": 9241664018,
+                "Name": "Utathya Ghate",
+                "Amount": 260
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9455622241,
+                "Name": "Shankara Narasimhan",
+                "Amount": 210
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 250
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9705384480,
+                "Name": "Latif Chia",
+                "Amount": 160
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9359394987,
+                "Name": "Tarun Mapkar",
+                "Amount": 100
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9688156631,
+                "Name": "Sahan Oak",
+                "Amount": 210
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9688156631,
+                "Name": "Sahan Oak",
+                "Amount": 280
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 110
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9699939066,
+                "Name": "Haripriya Nayak",
+                "Amount": 130
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 110
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 90
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9597628723,
+                "Name": "Sulya Gupta",
+                "Amount": 190
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9521737322,
+                "Name": "Riddhi Nair",
+                "Amount": 140
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9451926724,
+                "Name": "Sahan Sibal",
+                "Amount": 230
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9403313898,
+                "Name": "Adri Dave",
+                "Amount": 210
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9895408016,
+                "Name": "Mukul Krishna",
+                "Amount": 240
+            },
+            {
+                "Date": "2020-05-06",
+                "Phone": 9504662177,
+                "Name": "Tara Menon",
+                "Amount": 140
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 140
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9699939066,
+                "Name": "Haripriya Nayak",
+                "Amount": 280
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9732082404,
+                "Name": "Kali Chaudry",
+                "Amount": 130
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9150159527,
+                "Name": "Leya Sankaran",
+                "Amount": 250
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9820224845,
+                "Name": "Tanika Philip",
+                "Amount": 290
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9248936762,
+                "Name": "Arpana Raja",
+                "Amount": 260
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9293117791,
+                "Name": "Kumara Nayak",
+                "Amount": 200
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9640338121,
+                "Name": "Brahma Swamy",
+                "Amount": 200
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9732082404,
+                "Name": "Kali Chaudry",
+                "Amount": 280
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9265205814,
+                "Name": "Daeva Peri",
+                "Amount": 70
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9534474777,
+                "Name": "Daeva Tata",
+                "Amount": 160
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9252350612,
+                "Name": "Anushka Mody",
+                "Amount": 80
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 220
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9153022424,
+                "Name": "Hastin Mangal",
+                "Amount": 180
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9920950009,
+                "Name": "Rohan Sarma",
+                "Amount": 160
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9534474777,
+                "Name": "Daeva Tata",
+                "Amount": 230
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9359394987,
+                "Name": "Tarun Mapkar",
+                "Amount": 260
+            },
+            {
+                "Date": "2020-05-07",
+                "Phone": 9969345730,
+                "Name": "Kavi Edwin",
+                "Amount": 100
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 130
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 120
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9504662177,
+                "Name": "Tara Menon",
+                "Amount": 220
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9455622241,
+                "Name": "Shankara Narasimhan",
+                "Amount": 150
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 90
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9236367267,
+                "Name": "Takshaka Sandal",
+                "Amount": 110
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9330107696,
+                "Name": "Nipa Naidu",
+                "Amount": 70
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9927277067,
+                "Name": "Ranjan Khare",
+                "Amount": 180
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9140356318,
+                "Name": "Ballari Upadhyay",
+                "Amount": 270
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 70
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9518195948,
+                "Name": "Indra Chaudry",
+                "Amount": 180
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9976945538,
+                "Name": "Amitabha Kothari",
+                "Amount": 270
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9534474777,
+                "Name": "Daeva Tata",
+                "Amount": 210
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9504662177,
+                "Name": "Tara Menon",
+                "Amount": 210
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9293117791,
+                "Name": "Kumara Nayak",
+                "Amount": 200
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9293117791,
+                "Name": "Kumara Nayak",
+                "Amount": 140
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9248936762,
+                "Name": "Arpana Raja",
+                "Amount": 110
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9960294002,
+                "Name": "Mitra Gounder",
+                "Amount": 240
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9150159527,
+                "Name": "Leya Sankaran",
+                "Amount": 140
+            },
+            {
+                "Date": "2020-05-08",
+                "Phone": 9236367267,
+                "Name": "Takshaka Sandal",
+                "Amount": 250
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9732082404,
+                "Name": "Kali Chaudry",
+                "Amount": 100
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9521737322,
+                "Name": "Riddhi Nair",
+                "Amount": 140
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9293117791,
+                "Name": "Kumara Nayak",
+                "Amount": 190
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9590146908,
+                "Name": "Sachi Loliyekar",
+                "Amount": 150
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9688156631,
+                "Name": "Sahan Oak",
+                "Amount": 220
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9895408016,
+                "Name": "Mukul Krishna",
+                "Amount": 230
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9261697610,
+                "Name": "Niloufer Handa",
+                "Amount": 130
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9927277067,
+                "Name": "Ranjan Khare",
+                "Amount": 170
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9640338121,
+                "Name": "Brahma Swamy",
+                "Amount": 230
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9485132704,
+                "Name": "Sohalia Das",
+                "Amount": 250
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9330107696,
+                "Name": "Nipa Naidu",
+                "Amount": 240
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 180
+            },
+            {
+                "Date": "2020-05-09",
+                "Phone": 9389644210,
+                "Name": "Brahma Swamy",
+                "Amount": 210
+            }
+        ]
+
+                    const [userData,serUserData ] = useState(data)
+                    // console.log(userData)
+                    return(
+                        <div id = "name">
+                            <h1>Customer Dashboard</h1>
+                            < StatsContainer userData= {userData} />
+                            <CustomerContainer userData = {userData}/>
+                            <OrderDistribution userData = {userData} />
+
+                        </div>
+                    )
+                }
+
+                ReactDOM.render(<App/>,rootHandle)
+
+    
+            </script>
+        </body>
+   </html>
